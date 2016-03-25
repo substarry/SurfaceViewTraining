@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -19,6 +20,20 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     public MySurfaceView(Context context) {
         super(context);
+       init();
+    }
+
+    public MySurfaceView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public MySurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init(){
         mHolder = getHolder();
         mHolder.addCallback(this);
         mThread = new Thread(this);
@@ -70,18 +85,16 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 //画图
                 canvas.drawRect(rect, paint);
                 //画文字
-                canvas.drawText("count = " + (++count), 200, 700, paint);
+                paint.setTextSize(40);
+                canvas.drawText("count = " + (count++), 200, 700, paint);
+                //解除画布锁定，提交修改
+                mHolder.unlockCanvasAndPost(canvas);
             }
 
             try {
                 Thread.sleep(1000);
             } catch (Exception e){
                 e.printStackTrace();
-            } finally {
-                if(canvas != null){
-                    //解除画布锁定，提交修改
-                    mHolder.unlockCanvasAndPost(canvas);
-                }
             }
         }
     }
@@ -103,5 +116,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             default:
                 return Color.BLACK;
         }
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawColor(Color.WHITE);
     }
 }
